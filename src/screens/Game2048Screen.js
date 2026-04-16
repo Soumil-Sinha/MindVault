@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
   StatusBar, Platform, useWindowDimensions, Animated,
-  UIManager, LayoutAnimation,
+  UIManager, LayoutAnimation, PanResponder,
 } from 'react-native';
 import { ArrowLeft, RefreshCw } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -138,17 +138,23 @@ export default function Game2048Screen({ navigation }) {
     performSlide(dir, boardRef.current);
   }, [performSlide]);
 
-  const handleTouchStart = (e) => setTouchStart({ x: e.nativeEvent.pageX, y: e.nativeEvent.pageY });
-
-  const handleTouchEnd = (e) => {
-    if (!touchStart) return;
-    const dx = e.nativeEvent.pageX - touchStart.x;
-    const dy = e.nativeEvent.pageY - touchStart.y;
-    if (Math.abs(dx) < 20 && Math.abs(dy) < 20) return;
-    if (Math.abs(dx) > Math.abs(dy)) doMove(dx > 0 ? 'right' : 'left');
-    else doMove(dy > 0 ? 'down' : 'up');
-    setTouchStart(null);
-  };
+  // PanResponder for robust swipe detection
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderRelease: (evt, gestureState) => {
+        const { dx, dy } = gestureState;
+        // Minimum movement to consider a swipe
+        if (Math.abs(dx) < 15 && Math.abs(dy) < 15) return;
+        if (Math.abs(dx) > Math.abs(dy)) {
+          doMove(dx > 0 ? 'right' : 'left');
+        } else {
+          doMove(dy > 0 ? 'down' : 'up');
+        }
+      },
+    })
+  ).current;
 
   useEffect(() => {
     if (Platform.OS === 'web') {
@@ -218,8 +224,7 @@ export default function Game2048Screen({ navigation }) {
             { translateY: slideAnim.y },
           ],
         }]}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
+        {...panResponder.panHandlers}
       >
         {board.map((row, r) => (
           <View key={r} style={styles.row}>
