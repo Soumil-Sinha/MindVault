@@ -28,7 +28,7 @@ export default function LoginScreen({ navigation }) {
         {/* Top bar */}
         <View style={styles.topBar}>
           <TouchableOpacity style={styles.backBtn}>
-            <ArrowLeft size={20} color={colors.textPrimary} />
+            <ArrowLeft size={20} color="#000" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.memberBtn}>
             <Text style={styles.memberText}>MEMBER PORTAL</Text>
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
   topBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 },
   backBtn: {
     width: 40, height: 40, borderRadius: 8,
-    backgroundColor: colors.surface, justifyContent: 'center', alignItems: 'center',
+    backgroundColor: colors.pink, justifyContent: 'center', alignItems: 'center',
   },
   memberBtn: {
     backgroundColor: colors.yellow, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 8,

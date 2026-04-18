@@ -228,14 +228,18 @@ export default function MinesweeperScreen({ navigation }) {
       {/* Stats */}
       <View style={styles.statsRow}>
         <View style={styles.statBox}>
-          <Flag size={12} color={colors.pink} style={{ marginBottom: 4 }} />
-          <Text style={styles.statLabel}>MINES</Text>
-          <Text style={styles.statValue}>{String(minesLeft).padStart(3, '0')}</Text>
+          <Flag size={16} color={colors.pink} />
+          <View style={styles.statBoxTexts}>
+            <Text style={styles.statLabel}>MINES</Text>
+            <Text style={styles.statValue}>{String(minesLeft).padStart(3, '0')}</Text>
+          </View>
         </View>
         <View style={styles.statBox}>
-          <Timer size={14} color={colors.cyan} style={{ marginBottom: 4 }} />
-          <Text style={styles.statLabel}>TIME</Text>
-          <Text style={[styles.statValue, { color: colors.cyan }]}>{formatTime(seconds)}</Text>
+          <Timer size={16} color={colors.cyan} />
+          <View style={styles.statBoxTexts}>
+            <Text style={styles.statLabel}>TIME</Text>
+            <Text style={[styles.statValue, { color: colors.cyan }]}>{formatTime(seconds)}</Text>
+          </View>
         </View>
       </View>
 
@@ -306,14 +310,15 @@ export default function MinesweeperScreen({ navigation }) {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg, width: '100%', maxWidth: 500, alignSelf: 'center' },
 
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 18, paddingTop: 8, marginBottom: 14 },
-  iconBtn: { width: 38, height: 38, borderRadius: 8, backgroundColor: colors.bgCard, justifyContent: 'center', alignItems: 'center' },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 18, paddingVertical: 14, marginBottom: 14, backgroundColor: colors.purple },
+  iconBtn: { width: 38, height: 38, borderRadius: 8, backgroundColor: 'rgba(0,0,0,0.25)', justifyContent: 'center', alignItems: 'center' },
   title: { fontSize: 18, fontWeight: '900', color: colors.textPrimary, letterSpacing: 2 },
   newGameBtn: { backgroundColor: colors.yellowGreen, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 8 },
   newGameText: { color: '#000', fontSize: 12, fontWeight: '800', letterSpacing: 1 },
 
   statsRow: { flexDirection: 'row', paddingHorizontal: 18, gap: 12, marginBottom: 14 },
-  statBox: { flex: 1, backgroundColor: colors.bgCard, borderRadius: 12, padding: 12, alignItems: 'center', borderWidth: 1, borderColor: colors.border },
+  statBox: { flex: 1, backgroundColor: colors.bgCard, borderRadius: 12, padding: 14, flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1, borderColor: colors.border },
+  statBoxTexts: { flex: 1 },
   statLabel: { fontSize: 9, fontWeight: '700', color: colors.textMuted, letterSpacing: 1.5, marginBottom: 2 },
   statValue: { fontSize: 22, fontWeight: '900', color: colors.textAccentYellow, letterSpacing: 2 },
 

@@ -68,7 +68,7 @@ export default function StatsScreen() {
             <Trophy size={18} color="#fff" />
           </View>
           <Text style={styles.statCardBig}>{winRate}%</Text>
-          <Text style={styles.statCardSub}>Local History</Text>
+          <Text style={styles.statCardSub}>+2.4% vs last week</Text>
         </View>
 
         {/* Games Played */}
@@ -78,7 +78,7 @@ export default function StatsScreen() {
             <Gamepad2 size={18} color="#000" />
           </View>
           <Text style={[styles.statCardBig, { color: '#000' }]}>{stats.gamesPlayed}</Text>
-          <Text style={[styles.statCardSub, { color: 'rgba(0,0,0,0.6)' }]}>Lifetime sessions</Text>
+          <Text style={[styles.statCardSub, { color: 'rgba(0,0,0,0.6)' }]}>{stats.gamesPlayed} sessions total</Text>
         </View>
 
         {/* Avg Time */}
@@ -155,9 +155,9 @@ const styles = StyleSheet.create({
 
   periodRow: { flexDirection: 'row', backgroundColor: colors.bgCard, borderRadius: 12, padding: 4, marginBottom: 18, borderWidth: 1, borderColor: colors.border },
   periodBtn: { flex: 1, paddingVertical: 10, borderRadius: 10, alignItems: 'center' },
-  periodBtnActive: { backgroundColor: colors.surface },
+  periodBtnActive: { backgroundColor: colors.textPrimary },
   periodText: { color: colors.textMuted, fontSize: 12, fontWeight: '700', letterSpacing: 1 },
-  periodTextActive: { color: colors.textPrimary },
+  periodTextActive: { color: colors.bg },
 
   statCard: { borderRadius: 16, padding: 18, marginBottom: 12 },
   statCardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },

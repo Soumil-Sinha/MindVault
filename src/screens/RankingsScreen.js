@@ -3,7 +3,7 @@ import {
   View, Text, StyleSheet, ScrollView,
   TouchableOpacity, StatusBar,
 } from 'react-native';
-import { ArrowLeft, User, Star, UserRound, Flower, LogOut, CodeSquare } from 'lucide-react-native';
+import { ArrowLeft, Search, Star, UserRound, Flower, CodeSquare } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
 import { AuthContext } from '../context/AuthContext';
@@ -13,7 +13,7 @@ const TABS = ['DAILY', 'WEEKLY', 'ALL-TIME'];
 const AVATAR_COLORS = [colors.blue, colors.pink, colors.green, colors.yellow, colors.purple, colors.cyan, colors.red];
 
 export default function RankingsScreen() {
-  const [activeTab, setActiveTab] = useState('ALL-TIME');
+  const [activeTab, setActiveTab] = useState('WEEKLY');
   const [history, setHistory] = useState([]);
   const { user, signOut } = useContext(AuthContext);
 
@@ -40,12 +40,12 @@ export default function RankingsScreen() {
   const topList = sorted.slice(0, 3).map((h, i) => ({
     rank: i + 1,
     name: h.name,
-    xp: h.score.toLocaleString() + ' PTS',
-    isUser: h.isUser
+    xp: h.score.toLocaleString() + ' XP',
+    isUser: h.isUser,
   }));
 
   while (topList.length < 3) {
-    topList.push({ rank: topList.length + 1, name: '---', xp: '0 PTS', isUser: false });
+    topList.push({ rank: topList.length + 1, name: '---', xp: '0 XP', isUser: false });
   }
 
   const OTHERS = sorted.slice(3, 10).map((h, i) => ({
@@ -53,8 +53,11 @@ export default function RankingsScreen() {
     name: h.name,
     sub: h.sub,
     xp: h.score.toLocaleString(),
-    isUser: h.isUser
+    isUser: h.isUser,
   }));
+
+  const userRank = sorted.findIndex(h => h.isUser);
+  const displayRank = userRank >= 0 ? `#${userRank + 1}` : '#1,240';
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -62,17 +65,17 @@ export default function RankingsScreen() {
 
       {/* Header */}
       <View style={styles.header}>
-        <View style={styles.iconBtn}>
-          <User size={20} color={colors.textPrimary} />
-        </View>
-        <Text style={styles.title}>MY PROFILE</Text>
-        <TouchableOpacity style={styles.iconBtnLogout} onPress={signOut}>
-          <LogOut size={20} color="#fff" />
+        <TouchableOpacity style={styles.iconBtn}>
+          <ArrowLeft size={20} color={colors.textPrimary} />
+        </TouchableOpacity>
+        <Text style={styles.title}>GLOBAL RANKINGS</Text>
+        <TouchableOpacity style={styles.iconBtn} onPress={signOut}>
+          <Search size={20} color={colors.textPrimary} />
         </TouchableOpacity>
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        {/* Tab row */}
+        {/* Tab row — individual pill buttons */}
         <View style={styles.tabRow}>
           {TABS.map(t => (
             <TouchableOpacity
@@ -85,8 +88,6 @@ export default function RankingsScreen() {
           ))}
         </View>
 
-        <Text style={{color: colors.textSecondary, textAlign: 'center', marginBottom: 20, fontSize: 13, letterSpacing: 1}}>LOCAL HIGHSCORES</Text>
-
         {/* Podium */}
         <View style={styles.podium}>
           {/* #2 */}
@@ -95,10 +96,11 @@ export default function RankingsScreen() {
               <Text style={styles.badgeText}>#2</Text>
             </View>
             <View style={[styles.avatar, { borderColor: colors.blue, width: 64, height: 64, borderRadius: 32 }]}>
-              <User size={30} color={colors.textPrimary} />
+              <UserRound size={30} color={colors.textPrimary} />
             </View>
             <Text style={styles.podiumName}>
-              {topList[1].name} {topList[1].isUser && <Text style={{color: colors.purple}}> (YOU)</Text>}
+              {topList[1].name}
+              {topList[1].isUser && <Text style={{ color: colors.purple }}> (YOU)</Text>}
             </Text>
             <Text style={[styles.podiumXp, { color: colors.blue }]}>{topList[1].xp}</Text>
           </View>
@@ -115,7 +117,8 @@ export default function RankingsScreen() {
               <UserRound size={36} color={colors.textPrimary} />
             </View>
             <Text style={[styles.podiumName, { fontSize: 14 }]}>
-              {topList[0].name} {topList[0].isUser && <Text style={{color: colors.purple}}> (YOU)</Text>}
+              {topList[0].name}
+              {topList[0].isUser && <Text style={{ color: colors.purple }}> (YOU)</Text>}
             </Text>
             <Text style={[styles.podiumXp, { color: colors.yellow }]}>{topList[0].xp}</Text>
           </View>
@@ -129,7 +132,8 @@ export default function RankingsScreen() {
               <Flower size={30} color={colors.textPrimary} />
             </View>
             <Text style={styles.podiumName}>
-              {topList[2].name} {topList[2].isUser && <Text style={{color: colors.purple}}> (YOU)</Text>}
+              {topList[2].name}
+              {topList[2].isUser && <Text style={{ color: colors.purple }}> (YOU)</Text>}
             </Text>
             <Text style={[styles.podiumXp, { color: colors.pink }]}>{topList[2].xp}</Text>
           </View>
@@ -140,7 +144,7 @@ export default function RankingsScreen() {
           {OTHERS.map((player) => (
             <View key={player.rank} style={[styles.listRow, player.isUser && styles.listRowUser]}>
               <View style={[styles.rankBadge, player.isUser && { backgroundColor: colors.purple }]}>
-                <Text style={styles.rankNum}>#{player.rank}</Text>
+                <Text style={[styles.rankNum, player.isUser && { color: '#fff' }]}>#{player.rank}</Text>
               </View>
               <View style={[styles.listAvatar, { backgroundColor: AVATAR_COLORS[player.rank % AVATAR_COLORS.length] }]}>
                 <CodeSquare size={18} color="#fff" />
@@ -148,32 +152,49 @@ export default function RankingsScreen() {
               <View style={styles.listInfo}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                   <Text style={styles.listName}>{player.name}</Text>
-                  {player.isUser && <View style={styles.youBadge}><Text style={styles.youText}>{player.name.toUpperCase()}</Text></View>}
+                  {player.isUser && (
+                    <View style={styles.youBadge}><Text style={styles.youText}>YOU</Text></View>
+                  )}
                 </View>
+                {player.sub ? <Text style={styles.listSub}>{player.sub}</Text> : null}
               </View>
-              <Text style={[styles.listXp, player.isUser && { color: colors.purple }]}>{player.xp}</Text>
-              <Text style={styles.listPts}>PTS</Text>
+              <View style={styles.xpGroup}>
+                <Text style={[styles.listXp, player.isUser && { color: colors.purple }]}>{player.xp}</Text>
+                <Text style={styles.listPts}>POINTS</Text>
+              </View>
             </View>
           ))}
         </View>
       </ScrollView>
 
+      {/* Bottom position bar */}
+      <View style={styles.positionBar}>
+        <View style={[styles.positionAvatar, { backgroundColor: colors.purple }]}>
+          <UserRound size={18} color="#fff" />
+        </View>
+        <View style={styles.positionTexts}>
+          <Text style={styles.positionLabel}>YOUR POSITION</Text>
+          <Text style={styles.positionRank}>RANK {displayRank}</Text>
+        </View>
+        <TouchableOpacity style={styles.jumpBtn}>
+          <Text style={styles.jumpText}>JUMP TO ME  ↑</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg, width: '100%', maxWidth: 500, alignSelf: 'center' },
-  scroll: { paddingHorizontal: 18, paddingBottom: 100 },
+  scroll: { paddingHorizontal: 18, paddingBottom: 20 },
 
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 18, paddingTop: 12, marginBottom: 16 },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 18, paddingTop: 12, paddingBottom: 14 },
   iconBtn: { width: 38, height: 38, borderRadius: 8, backgroundColor: colors.bgCard, justifyContent: 'center', alignItems: 'center' },
-  iconBtnLogout: { width: 38, height: 38, borderRadius: 8, backgroundColor: '#5A1A1A', justifyContent: 'center', alignItems: 'center' },
   title: { fontSize: 16, fontWeight: '900', color: colors.textPrimary, letterSpacing: 1.5 },
 
-  tabRow: { flexDirection: 'row', backgroundColor: colors.bgCard, borderRadius: 12, padding: 4, marginBottom: 12, borderWidth: 1, borderColor: colors.border },
-  tabBtn: { flex: 1, paddingVertical: 10, borderRadius: 10, alignItems: 'center' },
-  tabBtnActive: { backgroundColor: colors.purple },
+  tabRow: { flexDirection: 'row', gap: 10, marginBottom: 24 },
+  tabBtn: { flex: 1, paddingVertical: 10, borderRadius: 24, alignItems: 'center', backgroundColor: colors.bgCard, borderWidth: 1, borderColor: colors.border },
+  tabBtnActive: { backgroundColor: colors.purple, borderColor: colors.purple },
   tabText: { color: colors.textMuted, fontSize: 12, fontWeight: '700', letterSpacing: 1 },
   tabTextActive: { color: '#fff' },
 
@@ -196,8 +217,21 @@ const styles = StyleSheet.create({
   listInfo: { flex: 1 },
   listName: { color: colors.textPrimary, fontSize: 14, fontWeight: '700' },
   listSub: { color: colors.textMuted, fontSize: 10, letterSpacing: 1, marginTop: 2 },
+  xpGroup: { alignItems: 'flex-end' },
   listXp: { color: colors.textAccentPurple, fontSize: 14, fontWeight: '800' },
   listPts: { color: colors.textMuted, fontSize: 9, letterSpacing: 0.5 },
   youBadge: { backgroundColor: colors.purple, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
   youText: { color: '#fff', fontSize: 9, fontWeight: '800' },
+
+  positionBar: {
+    flexDirection: 'row', alignItems: 'center', gap: 12,
+    backgroundColor: colors.bgCard, borderTopWidth: 1, borderTopColor: colors.border,
+    paddingHorizontal: 18, paddingVertical: 14,
+  },
+  positionAvatar: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
+  positionTexts: { flex: 1 },
+  positionLabel: { color: colors.textMuted, fontSize: 9, fontWeight: '700', letterSpacing: 1.5, marginBottom: 2 },
+  positionRank: { color: colors.yellow, fontSize: 15, fontWeight: '900', letterSpacing: 1 },
+  jumpBtn: { backgroundColor: colors.purple, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10 },
+  jumpText: { color: '#fff', fontSize: 12, fontWeight: '800', letterSpacing: 0.5 },
 });
